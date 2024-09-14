@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,11 +80,19 @@ WSGI_APPLICATION = 'vaccinationApi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        # Feel free to alter this value to suit your needs.
+        default="postgresql://vaccinationdb_znvv_user:sUjXKjk1NvqbDhWziX5eIMu9WufkzWjy@dpg-crimc1m8ii6s73f62o20-a.oregon-postgres.render.com/vaccinationdb_znvv",
+        conn_max_age=600,
+    )
 }
 
 
@@ -132,3 +141,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'account.Account'
+
