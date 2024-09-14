@@ -1,5 +1,5 @@
 from rest_framework import generics, permissions, authentication, status
-from .serializers import AccountSerializer, AccountPropertiesSerializer
+from .serializers import AccountSerializer, AccountPropertiesSerializer, AdminSerializer, AdminPropertiesSerializer
 from .models import Account
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -10,6 +10,27 @@ from django.contrib.auth.hashers import check_password
 class UserRegistrationView(generics.CreateAPIView):
     serializer_class = AccountSerializer
     permission_classes = (permissions.AllowAny,)
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        # Manually create a token for the user
+        token, created = Token.objects.get_or_create(user=user)
+
+        # Customize the response to include the user details and token
+        return Response(
+            {
+                "user": {
+                    "first_name": user.first_name,
+                    "last_name": user.last_name,
+                    "email": user.email,
+                    "user_type": user.user_type,
+                },
+                "token": token.key,  # Return the token key
+            }
+        )
 
 
 class CustomAuthModel(ObtainAuthToken):
@@ -33,7 +54,7 @@ class CustomAuthModel(ObtainAuthToken):
                 "phone_number": user.phone_number,
                 "token": token.key,
                 "user_id": user.pk,
-                "response": "Login successfully",
+                "user_type": user.user_type,
             }
         )
 
@@ -66,3 +87,27 @@ class ChangePassword(generics.UpdateAPIView):
         return Response(
             {"message": "Password successfully changed"}, status=status.HTTP_200_OK
         )
+
+
+class CreateHospitalAdmin(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.TokenAuthentication]
+    serializer_class = AdminSerializer
+    queryset = Account.objects.all()
+
+
+class ListHospitalAdmin(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.TokenAuthentication]
+    serializer_class = AdminPropertiesSerializer
+
+    def get_queryset(self):
+        hospital = self.kwargs.get("pk")
+        return Account.objects.filter(hospital=hospital)
+
+
+class DeleteAdmin(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.TokenAuthentication]
+    serializer_class = AdminPropertiesSerializer
+    queryset = Account.objects.all()

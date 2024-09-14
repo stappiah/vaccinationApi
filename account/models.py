@@ -5,8 +5,16 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
+from base.models import Hospital
 
-USER_TYPES = [("admin", "Administrator"), ("mother", "Mother")]
+USER_TYPES = [
+    ("admin", "Administrator"),
+    ("mother", "Mother"),
+    ("nurse", "Nurse"),
+    ("doctor", "Doctor"),
+    ("receptionist", "Receptionist"),
+    ("other", "Other"),
+]
 
 LOCATION_REGION = [
     ("Upper West Region", "Upper West Region"),
@@ -61,6 +69,13 @@ class Account(AbstractBaseUser, PermissionsMixin):
     address = models.CharField(max_length=64, blank=True, null=True)
     region = models.CharField(
         choices=LOCATION_REGION, max_length=20, blank=True, null=True
+    )
+    hospital = models.ForeignKey(
+        Hospital,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="hospital_users",
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

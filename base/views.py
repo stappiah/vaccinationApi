@@ -1,16 +1,14 @@
 from .serializers import (
     HostpitalSerializer,
     ChildSerializer,
-    AppointmentSerializer,
     VaccinationSerializer,
-    AvailabilitySerializer,
 )
 from rest_framework import generics, permissions, authentication
-from .models import Hospital, Child, Appointment, Vaccinaton, Availability
+from .models import Hospital, Child, Appointment, Vaccinaton
 
 
 # Create your views here.
-class CreateHostpital(generics.CreateAPIView):
+class CreateListHostpital(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [authentication.TokenAuthentication]
     serializer_class = HostpitalSerializer
@@ -31,18 +29,21 @@ class CreateChild(generics.CreateAPIView):
     queryset = Child.objects.all()
 
 
-class CreateAppointment(generics.CreateAPIView):
+class RetrieveUpdateDeleteChild(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [authentication.TokenAuthentication]
-    serializer_class = AppointmentSerializer
-    queryset = Appointment.objects.all()
+    serializer_class = ChildSerializer
+    queryset = Child.objects.all()
 
 
-class RetrieveUpdateDeleteAppointment(generics.RetrieveUpdateDestroyAPIView):
+class RetrieveParentChild(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [authentication.TokenAuthentication]
-    serializer_class = AppointmentSerializer
-    queryset = Appointment.objects.all()
+    serializer_class = ChildSerializer
+
+    def get_queryset(self):
+        parent_id = self.request.user.id
+        return Child.objects.filter(parent=parent_id)
 
 
 class CreateVaccination(generics.CreateAPIView):
@@ -59,8 +60,23 @@ class RetrieveUpdate(generics.RetrieveUpdateAPIView):
     queryset = Vaccinaton.objects.all()
 
 
-class CreateAvailability(generics.CreateAPIView):
+# Admin
+class GetAdminHospital(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [authentication.TokenAuthentication]
-    serializer_class = AvailabilitySerializer
-    queryset = Availability.objects.all()
+    serializer_class = HostpitalSerializer
+
+    def get_queryset(self):
+        return Hospital.objects.filter(admin=self.request.user)
+    
+
+class ConfirmDiseaseForHospital(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.TokenAuthentication]
+    serializer_class = VaccinationSerializer
+
+    def get_queryset(self):
+        disease = self.request.query_params.get("disease")  # Get 'disease' from query params
+        if disease:
+            return Vaccinaton.objects.filter(parent=self.request.user, disease=disease)
+        return Vaccinaton.objects.none()

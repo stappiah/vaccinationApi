@@ -1,9 +1,8 @@
 from django.db import models
-from django.contrib.auth import get_user_model
+from django.conf import settings
 
 # Create your models here.
 
-User = get_user_model()
 
 LOCATION_REGION = [
     ("Upper West Region", "Upper West Region"),
@@ -43,7 +42,11 @@ GENDER = [("male", "Male"), ("female", "Female")]
 
 
 class Hospital(models.Model):
-    admin = models.ForeignKey(User, on_delete=models.CASCADE)
+    admin = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="administered_hospitals",
+    )
     name = models.CharField(max_length=60)
     bio = models.TextField(blank=True, null=True)
     address = models.CharField(max_length=60)
@@ -52,7 +55,6 @@ class Hospital(models.Model):
     email = models.EmailField(unique=True)
     region = models.CharField(max_length=20, choices=LOCATION_REGION)
     image = models.ImageField(upload_to="hospital_image")
-    rating = models.DecimalField(decimal_places=1, default=0, max_digits=1)
     start_time = models.TimeField()
     end_time = models.TimeField()
     date_created = models.DateTimeField(auto_now_add=True)
@@ -63,7 +65,7 @@ class Hospital(models.Model):
 
 
 class Child(models.Model):
-    parent = models.ForeignKey(User, on_delete=models.CASCADE)
+    parent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     first_name = models.CharField(max_length=50)
     middle_name = models.CharField(max_length=50, null=True, blank=True)
     last_name = models.CharField(max_length=50)
@@ -73,7 +75,7 @@ class Child(models.Model):
 
 
 class Appointment(models.Model):
-    parent = models.ForeignKey(User, on_delete=models.CASCADE)
+    parent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     child = models.ForeignKey(Child, on_delete=models.CASCADE)
     disease = models.CharField(max_length=12, choices=DISEASES)
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
@@ -89,16 +91,10 @@ class Appointment(models.Model):
 
 class Vaccinaton(models.Model):
     hospital = models.ForeignKey(Hospital, on_delete=models.PROTECT)
-    child = models.ForeignKey(Child, on_delete=models.CASCADE)
+    parent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     disease = models.CharField(max_length=12, choices=DISEASES)
     first_dose = models.BooleanField(default=False)
     second_dose = models.BooleanField(default=False)
     third_dose = models.BooleanField(default=False)
     date_taken = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-
-
-class Availability(models.Model):
-    admin = models.ForeignKey(User, on_delete=models.PROTECT)
-    hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
-    date = models.DateField()
