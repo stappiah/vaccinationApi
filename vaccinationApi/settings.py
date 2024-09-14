@@ -31,7 +31,7 @@ ALLOWED_HOSTS = [
     "192.168.43.67",
     "127.10.10.67",
     "192.168.107.1",
-    "https://vaccinationapi.onrender.com",
+    "vaccinationapi.onrender.com",
 ]
 
 
