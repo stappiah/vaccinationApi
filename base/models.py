@@ -76,7 +76,6 @@ class Child(models.Model):
 
 class Appointment(models.Model):
     parent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    child = models.ForeignKey(Child, on_delete=models.CASCADE)
     disease = models.CharField(max_length=12, choices=DISEASES)
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
     date = models.DateField()
@@ -88,6 +87,9 @@ class Appointment(models.Model):
     def __str__(self):
         return f"Appointment between {self.parent.first_name} {self.parent.last_name} and {self.hospital.name}"
 
+    @property
+    def hospital_name(self):
+        return self.hospital.name
 
 class Vaccinaton(models.Model):
     hospital = models.ForeignKey(Hospital, on_delete=models.PROTECT)
@@ -98,3 +100,11 @@ class Vaccinaton(models.Model):
     third_dose = models.BooleanField(default=False)
     date_taken = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    # @property
+    # def hospital_detail(self):
+    #     try:
+    #         hospital = self.hospital.name
+    #     except:
+    #         return "No region"
+    #     return region

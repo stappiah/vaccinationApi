@@ -2,6 +2,7 @@ from .serializers import (
     HostpitalSerializer,
     ChildSerializer,
     VaccinationSerializer,
+    AppointmentSerializer,
 )
 from rest_framework import generics, permissions, authentication
 from .models import Hospital, Child, Appointment, Vaccinaton
@@ -68,7 +69,7 @@ class GetAdminHospital(generics.ListAPIView):
 
     def get_queryset(self):
         return Hospital.objects.filter(admin=self.request.user)
-    
+
 
 class ConfirmDiseaseForHospital(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -76,7 +77,25 @@ class ConfirmDiseaseForHospital(generics.ListAPIView):
     serializer_class = VaccinationSerializer
 
     def get_queryset(self):
-        disease = self.request.query_params.get("disease")  # Get 'disease' from query params
+        disease = self.request.query_params.get(
+            "disease"
+        )  # Get 'disease' from query params
         if disease:
             return Vaccinaton.objects.filter(parent=self.request.user, disease=disease)
         return Vaccinaton.objects.none()
+
+
+class CreateAppointment(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.TokenAuthentication]
+    serializer_class = AppointmentSerializer
+    queryset = Appointment.objects.all()
+
+
+class RetrieveParentAppointment(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [authentication.TokenAuthentication]
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self):
+        return Appointment.objects.filter(parent=self.request.user)

@@ -26,7 +26,21 @@ class ChildSerializer(serializers.ModelSerializer):
 
 
 class VaccinationSerializer(serializers.ModelSerializer):
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(), default=serializers.CurrentUserDefault()
+    )
+
     class Meta:
         model = Vaccinaton
         fields = "__all__"
 
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=Account.objects.all(), default=serializers.CurrentUserDefault()
+    )
+    hospital_name = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Appointment
+        fields = "__all__"
