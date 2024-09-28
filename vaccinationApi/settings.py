@@ -104,7 +104,7 @@ WSGI_APPLICATION = "vaccinationApi.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         # Feel free to alter this value to suit your needs.
-        default="postgresql://vaccinationdb_znvv_user:sUjXKjk1NvqbDhWziX5eIMu9WufkzWjy@dpg-crimc1m8ii6s73f62o20-a.oregon-postgres.render.com/vaccinationdb_znvv",
+        default="postgresql://vaccinationdb_4bxc_user:A35VFMEWiJh3rkTMm5aSlJeOPhZPCg7J@dpg-crrteh8gph6c738lka40-a.oregon-postgres.render.com/vaccinationdb_4bxc",
         conn_max_age=600,
     )
 }
