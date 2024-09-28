@@ -25,7 +25,7 @@ class UserRegistrationView(generics.CreateAPIView):
                 "user": {
                     "first_name": user.first_name,
                     "last_name": user.last_name,
-                    "email": user.email,
+                    "phone_number": user.phone_number,
                     "user_type": user.user_type,
                 },
                 "token": token.key,  # Return the token key
@@ -50,7 +50,6 @@ class CustomAuthModel(ObtainAuthToken):
             {
                 "first_name": user.first_name,
                 "last_name": user.last_name,
-                "email": user.email,
                 "phone_number": user.phone_number,
                 "token": token.key,
                 "user_id": user.pk,
@@ -103,7 +102,7 @@ class ListHospitalAdmin(generics.ListAPIView):
 
     def get_queryset(self):
         hospital = self.kwargs.get("pk")
-        return Account.objects.filter(hospital=hospital)
+        return Account.objects.filter(hospital=hospital).order_by('-date_joined')
 
 
 class DeleteAdmin(generics.DestroyAPIView):
@@ -111,3 +110,4 @@ class DeleteAdmin(generics.DestroyAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     serializer_class = AdminPropertiesSerializer
     queryset = Account.objects.all()
+

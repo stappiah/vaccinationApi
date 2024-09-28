@@ -37,16 +37,15 @@ LOCATION_REGION = [
 
 
 class AccountManager(BaseUserManager):
-    def create_user(self, email, user_type, password=None, **extra_fields):
-        if not email:
-            raise ValueError("The Email field must be set")
-        email = self.normalize_email(email).lower()
-        user = self.model(email=email, user_type=user_type, **extra_fields)
+    def create_user(self, phone_number, user_type, password=None, **extra_fields):
+        if not phone_number:
+            raise ValueError("Phone number is required")
+        user = self.model(phone_number=phone_number, user_type=user_type, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, phone_number, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_active", True)
         extra_fields.setdefault("is_superuser", True)
@@ -56,16 +55,14 @@ class AccountManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self.create_user(email, "admin", password, **extra_fields)
+        return self.create_user(phone_number, "admin", password, **extra_fields)
 
 
 class Account(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     user_type = models.CharField(max_length=13, choices=USER_TYPES)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
-    date_of_birth = models.DateField(blank=True, null=True)
+    phone_number = models.CharField(max_length=20, unique=True)
     address = models.CharField(max_length=64, blank=True, null=True)
     region = models.CharField(
         choices=LOCATION_REGION, max_length=20, blank=True, null=True
@@ -80,13 +77,12 @@ class Account(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    profile_image = models.ImageField(upload_to="user_images/", null=True, blank=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True)
 
     objects = AccountManager()
 
-    USERNAME_FIELD = "email"
+    USERNAME_FIELD = "phone_number"
 
     def __str__(self):
-        return self.email
+        return self.phone_number

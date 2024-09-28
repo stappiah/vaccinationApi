@@ -34,9 +34,8 @@ DISEASES = [
 
 APPOINTMENT_STATUS = [
     ("cancelled", "Cancelled"),
-    ("confirmed", "Confirmed"),
+    ("approved", "Approved"),
     ("pending", "Pending"),
-    ("rescheduled", "Rescheduled"),
 ]
 GENDER = [("male", "Male"), ("female", "Female")]
 
@@ -78,9 +77,10 @@ class Appointment(models.Model):
     parent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     disease = models.CharField(max_length=12, choices=DISEASES)
     hospital = models.ForeignKey(Hospital, on_delete=models.CASCADE)
+    note = models.TextField(null=True, blank=True)
     date = models.DateField()
     time = models.TimeField()
-    status = models.BooleanField(default=False)
+    status = models.CharField(max_length=9, choices=APPOINTMENT_STATUS, default="pending")
     date_created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -90,6 +90,15 @@ class Appointment(models.Model):
     @property
     def hospital_name(self):
         return self.hospital.name
+
+    @property
+    def get_parent(self):
+        return self.parent.first_name + " " + self.parent.last_name
+
+    @property
+    def get_phone_number(self):
+        return self.parent.phone_number
+
 
 class Vaccinaton(models.Model):
     hospital = models.ForeignKey(Hospital, on_delete=models.PROTECT)
@@ -101,10 +110,10 @@ class Vaccinaton(models.Model):
     date_taken = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
-    # @property
-    # def hospital_detail(self):
-    #     try:
-    #         hospital = self.hospital.name
-    #     except:
-    #         return "No region"
-    #     return region
+    @property
+    def get_parent(self):
+        return self.parent.first_name + " " + self.parent.last_name
+
+    @property
+    def get_phone_number(self):
+        return self.parent.phone_number

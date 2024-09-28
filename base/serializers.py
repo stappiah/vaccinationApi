@@ -29,6 +29,8 @@ class VaccinationSerializer(serializers.ModelSerializer):
     parent = serializers.PrimaryKeyRelatedField(
         queryset=Account.objects.all(), default=serializers.CurrentUserDefault()
     )
+    get_parent = serializers.ReadOnlyField()
+    get_phone_number = serializers.ReadOnlyField()
 
     class Meta:
         model = Vaccinaton
@@ -40,6 +42,8 @@ class AppointmentSerializer(serializers.ModelSerializer):
         queryset=Account.objects.all(), default=serializers.CurrentUserDefault()
     )
     hospital_name = serializers.ReadOnlyField()
+    get_parent = serializers.ReadOnlyField()
+    get_phone_number = serializers.ReadOnlyField()
 
     class Meta:
         model = Appointment

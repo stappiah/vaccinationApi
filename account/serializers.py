@@ -10,7 +10,7 @@ class AccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = (
-            "email",
+            "phone_number",
             "first_name",
             "last_name",
             "user_type",
@@ -30,7 +30,7 @@ class AccountSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"password": "Passwords must match"})
 
         user = Account(
-            email=validated_data["email"],
+            phone_number=validated_data["phone_number"],
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
             user_type=validated_data["user_type"],
@@ -53,7 +53,6 @@ class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
         fields = (
-            "email",
             "first_name",
             "last_name",
             "user_type",
@@ -79,7 +78,6 @@ class AdminSerializer(serializers.ModelSerializer):
 
         # Use the manager's create_user method for better consistency
         user = Account.objects.create_user(
-            email=validated_data["email"],
             first_name=validated_data["first_name"],
             last_name=validated_data["last_name"],
             user_type=validated_data["user_type"],
@@ -99,7 +97,6 @@ class AdminPropertiesSerializer(serializers.ModelSerializer):
             "hospital",
             "first_name",
             "last_name",
-            "email",
             "phone_number",
             "user_type"
         ]
@@ -112,10 +109,6 @@ class AccountPropertiesSerializer(serializers.ModelSerializer):
             "id",
             "first_name",
             "last_name",
-            "email",
             "phone_number",
-            "address",
-            "region",
-            "date_of_birth",
-            "profile_image",
+            "user_type",
         ]
